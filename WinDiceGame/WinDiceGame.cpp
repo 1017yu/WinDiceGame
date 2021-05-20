@@ -5,6 +5,7 @@
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK about(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HBITMAP hBmpJ1, hBmpJ2, hBmpJ3, hBmpJ4, hBmpJ5, hBmpJ6;
+HBITMAP hBmpJ11, hBmpJ22, hBmpJ33, hBmpJ44, hBmpJ55, hBmpJ66;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInstanc, LPSTR lpCmdLine, int nShowCmd)
 
@@ -49,6 +50,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInstanc, LPSTR lpCmdLine, 
 	hBmpJ4 = LoadBitmap(hInstance, "IDB_J4");
 	hBmpJ5 = LoadBitmap(hInstance, "IDB_J5");
 	hBmpJ6 = LoadBitmap(hInstance, "IDB_J6");
+	hBmpJ11 = LoadBitmap(hInstance, "IDB_J1");
+	hBmpJ22 = LoadBitmap(hInstance, "IDB_J2");
+	hBmpJ33 = LoadBitmap(hInstance, "IDB_J3");
+	hBmpJ44 = LoadBitmap(hInstance, "IDB_J4");
+	hBmpJ55 = LoadBitmap(hInstance, "IDB_J5");
+	hBmpJ66 = LoadBitmap(hInstance, "IDB_J6");
+
 
 	// 5. Message loop --------------------------------------------------------------
 
@@ -71,19 +79,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HWND hButtStart, hButtStop, hButtExit;
 	static HWND hEdit;
-	HDC hDC, hMemDC;
+	static int a, b, ma, mb;
+
+	char szText[100];
+
+	HDC hDC, hMemDC, hMemDC2;
 
 	switch (uMsg)
 	{
 	case WM_CREATE:
 		hButtStart = CreateWindow("BUTTON", "Start", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			10, 400, 90, 30, hWnd, (HMENU)1, NULL, NULL);
+			310, 400, 90, 30, hWnd, (HMENU)1, NULL, NULL);
 
 		hButtStop = CreateWindow("BUTTON", "Stop", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			110, 400, 90, 30, hWnd, (HMENU)2, NULL, NULL);
+			410, 400, 90, 30, hWnd, (HMENU)2, NULL, NULL);
 
 		hButtExit = CreateWindow("BUTTON", "Exit", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			210, 400, 90, 30, hWnd, (HMENU)3, NULL, NULL);
+			510, 400, 90, 30, hWnd, (HMENU)3, NULL, NULL);
 
 		return FALSE;
 
@@ -94,6 +106,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case 2:
+			hDC = GetDC(hWnd);
+			sprintf_s(szText, "Dice Score: %d + %d = %d ", ma, mb, ma + mb);
+			TextOut(hDC, 10, 410, szText, lstrlen(szText));
 			KillTimer(hWnd, 1);
 			break;
 
@@ -107,12 +122,81 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		hDC = GetDC(hWnd);
 		hMemDC = CreateCompatibleDC(hDC);
+		hMemDC2 = CreateCompatibleDC(hDC);
 		InvalidateRect(hWnd, NULL, TRUE);
 		UpdateWindow(hWnd);
+		a = rand();
+		b = rand();
 
-		SelectObject(hMemDC, hBmpJ1);
+		ma = (a % 6) + 1;  /* ma = 0+1 ~ 5+1 */
+		mb = (b % 6) + 1;
+		switch (ma) {
+		case 1:
+			SelectObject(hMemDC, hBmpJ1);
+			
+			break;
 
-		BitBlt(hDC, 50, 100, 88, 88, hMemDC, 0, 0, SRCCOPY);
+		case 2:
+			SelectObject(hMemDC, hBmpJ2);
+			
+			break;
+
+		case 3:
+			SelectObject(hMemDC, hBmpJ3);
+		
+			break;
+
+		case 4:
+			SelectObject(hMemDC, hBmpJ4);
+		
+			break;
+
+		case 5:
+			SelectObject(hMemDC, hBmpJ5);
+	
+			break;
+
+		case 6:
+			SelectObject(hMemDC, hBmpJ6);
+
+			break;
+		}
+
+		BitBlt(hDC, (ma-1)*100, (mb-1)*60, 88, 88, hMemDC, 0, 0, SRCCOPY);
+
+		switch (mb) {
+		case 1:
+			SelectObject(hMemDC, hBmpJ1);
+
+			break;
+
+		case 2:
+			SelectObject(hMemDC, hBmpJ2);
+
+			break;
+
+		case 3:
+			SelectObject(hMemDC, hBmpJ3);
+
+			break;
+
+		case 4:
+			SelectObject(hMemDC, hBmpJ4);
+
+			break;
+
+		case 5:
+			SelectObject(hMemDC, hBmpJ5);
+
+			break;
+
+		case 6:
+			SelectObject(hMemDC, hBmpJ6);
+
+			break;
+		}
+
+		BitBlt(hDC, (mb - 1) * 100, (ma - 1) * 60, 88, 88, hMemDC, 0, 0, SRCCOPY);
 		ReleaseDC(hWnd, hDC);
 		DeleteDC(hMemDC);
 
